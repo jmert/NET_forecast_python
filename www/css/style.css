@@ -1,0 +1,750 @@
+/** START HTML5 Boilerplate CSS **/
+/**
+ * HTML5 . Boilerplate
+ *
+ * style.css contains a reset, font normalization and some base styles.
+ *
+ * Credit is left where credit is due.
+ * Much inspiration was taken from these projects:
+ * - yui.yahooapis.com/2.8.1/build/base/base.css
+ * - camendesign.com/design/
+ * - praegnanz.de/weblog/htmlcssjs-kickstart
+ */
+
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Montserrat-Regular'), url(Montserrat.woff) format('woff');
+}
+
+/**
+ * html5doctor.com Reset Stylesheet (Eric Meyer's Reset Reloaded + HTML5 baseline)
+ * v1.6.1 2010-09-17 | Authors: Eric Meyer & Richard Clark
+ * html5doctor.com/html-5-reset-stylesheet/
+ */
+/* line 30, ../sass/partials/_boilerplate.scss */
+html, body, body div, span, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp,
+small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+}
+
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+blockquote, q {
+  quotes: none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: "";
+  content: none;
+}
+
+ins {
+  background-color: #ff9;
+  color: #000;
+  text-decoration: none;
+}
+
+mark {
+  background-color: #ff9;
+  color: #000;
+  font-style: italic;
+  font-weight: bold;
+}
+
+del {
+  text-decoration: line-through;
+}
+
+abbr[title], dfn[title] {
+  border-bottom: 1px dotted;
+  cursor: help;
+}
+
+table,td, th { 
+  border-collapse: collapse;
+  border-spacing: 0;
+  border: 1px solid #444;
+  padding: .3em;
+ }
+
+table
+{
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  border-width: 0px;
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+table.noborder, td.noborder { 
+  border: 0px;
+  padding: 0;
+}
+
+td, th
+{
+    margin: 0;
+    padding: 4px;
+    border-width: 1px 1px 0 0;
+}
+
+th
+{ 
+    background-color: #D9D9DA;
+}
+
+hr {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #ccc;
+  margin: 1em 0;
+  padding: 0;
+}
+
+.figcaption { 
+    font-style: italic;
+ }
+
+/* Hack retained to preserve specificity */
+/* Normalize monospace sizing:
+   en.wikipedia.org/wiki/MediaWiki_talk:Common.css/Archive_11#Teletype_style_fix_for_Chrome */
+Pre, Code, Kbd, Samp, tt {
+  Font-Family: Monospace, Sans-Serif;
+}
+
+/**
+ * Minimal base styles.
+ */
+/* 1) Always force a scrollbar in non-IE
+   2) Remove iOS text size adjust without disabling user zoom: www.456bereastreet.com/archive/201012/controlling_text_size_in_safari_for_ios_without_disabling_user_zoom/ */
+/* line 77, ../sass/partials/_boilerplate.scss */
+html {
+  overflow-y: scroll;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+
+/* j.mp/webkit-tap-highlight-color */
+a:link {
+  -webkit-tap-highlight-color: #FF5E99;
+}
+
+/* Accessible focus treatment: people.opera.com/patrickl/experiments/keyboard/test */
+a:hover, a:active {
+  outline: none;
+}
+
+a, a:active, a:visited {
+  color: #607890;
+}
+
+a:hover {
+  color: #036;
+}
+
+ul, ol {
+  margin-left: 2em;
+}
+
+ol {
+  list-style-type: decimal;
+}
+
+/* Remove margins for navigation lists */
+nav ul, nav li {
+  margin: 0;
+  list-style: none;
+  list-style-image: none;
+}
+
+small {
+  font-size: 85%;
+}
+
+b, strong, th {
+  font-weight: bold;
+}
+
+td {
+  vertical-align: top;
+}
+
+/* Set sub, sup without affecting line-height: gist.github.com/413930 */
+sub, sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+}
+
+sup {
+  top: -0.5em;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+pre {
+  /* www.pathf.com/blogs/2008/05/formatting-quoted-code-in-blog-posts-css21-white-space-pre-wrap/ */
+  white-space: pre;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  padding: 15px;
+}
+
+.ie6 legend, .ie7 legend {
+  margin-left: -7px;
+}
+
+/* 1) Make inputs and buttons play nice in IE: www.viget.com/inspire/styling-the-button-element-in-internet-explorer/
+   2) WebKit browsers add a 2px margin outside the chrome of form elements.
+      Firefox adds a 1px margin above and below textareas
+   3) Set font-size to match <body>'s, and font-family to sans-serif
+   4) Align to baseline */
+button, input, select, textarea {
+  width: auto;
+  overflow: visible;
+  margin: 0;
+  font-size: 100%;
+  font-family: sans-serif;
+  vertical-align: baseline;
+}
+
+/* 1) Remove default scrollbar in IE: www.sitepoint.com/blogs/2010/08/20/ie-remove-textarea-scrollbars/
+   2) Align to text-top */
+textarea {
+  overflow: auto;
+  vertical-align: text-top;
+}
+
+/* Hand cursor on clickable input elements */
+label, input[type="button"], input[type="submit"], input[type="image"], button {
+  cursor: pointer;
+}
+
+/* Remove extra padding and inner border in Firefox */
+input::-moz-focus-inner,
+button::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+
+/* Colors for form validity */
+input:invalid, textarea:invalid {
+  border-radius: 1px;
+  -moz-box-shadow: 0px 0px 5px red;
+  -webkit-box-shadow: 0px 0px 5px red;
+  box-shadow: 0px 0px 5px red;
+}
+
+.no-boxshadow input:invalid, .no-boxshadow textarea:invalid {
+  background-color: #f0dddd;
+}
+
+/* Simple blockquote style */
+blockquote {
+  padding: 0.8em 40px 0.8em 40px;
+  font-style: italic;
+}
+
+
+/* Bicubic resizing for non-native sized IMG:
+   code.flickr.com/blog/2008/11/12/on-ui-quality-the-little-things-client-side-image-resizing/ */
+.ie7 img {
+  -ms-interpolation-mode: bicubic;
+}
+
+/**
+ * You might tweak these..
+ */
+body, select, input, textarea {
+  /* #444 looks better than black: twitter.com/H_FJ/statuses/11800719859 */
+  color: #444;
+  /* Set your base font here, to apply evenly */
+  /* font-family: Georgia, serif;  */
+}
+
+/* These selection declarations have to be separate
+   No text-shadow: twitter.com/miketaylr/status/12228805301
+   Also: hot pink! */
+::-moz-selection {
+  background: #eb5f3a;
+  color: #fff;
+  text-shadow: none;
+}
+
+::selection {
+  background: #eb5f3a;
+  color: #fff;
+  text-shadow: none;
+}
+
+/**
+ * Primary styles
+ *
+ */
+
+/* Hide for both screenreaders and browsers:
+   css-discuss.incutio.com/wiki/Screenreader_Visibility */
+.hidden {
+  display: none;
+  visibility: hidden;
+}
+
+/* Hide only visually, but have it available for screenreaders: by Jon Neal.
+  www.webaim.org/techniques/css/invisiblecontent/  &  j.mp/visuallyhidden */
+.visuallyhidden {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+/* Extends the .visuallyhidden class to allow the element to be focusable when navigated to via the keyboard: drupal.org/node/897638 */
+.visuallyhidden.focusable:active,
+.visuallyhidden.focusable:focus {
+  clip: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  position: static;
+  width: auto;
+}
+
+/* Hide visually and from screenreaders, but maintain layout */
+.invisible {
+  visibility: hidden;
+}
+
+
+/**
+ * Placeholder media queries for responsive design. Modify as design requires.
+ * These follow after, and will override, the primary ('mobile first') styles
+ * The closing /mediaquery comment is required by respond.js min/max-width Media Query polyfill
+ */
+@media only screen and (min-width: 480px) {
+  /* Style adjustments for viewports 480px and over go here */
+}
+/*/mediaquery*/
+@media only screen and (min-width: 768px) {
+  /* Style adjustments for viewports 768px and over go here */
+}
+
+/**
+ * Print styles.
+ *
+ */
+@media print {
+  * {
+    background: transparent !important;
+/*    color: black !important;*/
+    text-shadow: none !important;
+    filter: none !important;
+    -ms-filter: none !important;
+  }
+
+  /* Black prints faster: sanbeiji.com/archives/953 */
+  a, a:visited {
+    color: #444 !important;
+    text-decoration: underline;
+  }
+
+  a[href]:after {
+    content: " (" attr(href) ")";
+  }
+
+  abbr[title]:after {
+    content: " (" attr(title) ")";
+  }
+
+  .ir a:after, a[href^="javascript:"]:after, a[href^="#"]:after {
+    content: "";
+  }
+
+  pre, blockquote {
+    border: 1px solid #999;
+    page-break-inside: avoid;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tr, img {
+    page-break-inside: avoid;
+  }
+
+  img {
+    max-width: 100% !important;
+  }
+
+  @page {
+    margin: 0.5cm;
+}
+
+  p, h2, h3 {
+    orphans: 3;
+    widows: 3;
+  }
+
+  h2, h3 {
+    page-break-after: avoid;
+  }
+}
+
+.aligncenter {
+  display: block;
+  margin: 0 auto;
+}
+
+#menu-top,#menu-bottom {
+  text-align: center;
+}
+
+.alignleft {
+  float: left;
+}
+
+.alignright {
+  float: right;
+}
+
+
+/* TYPOGRAPHY */
+/* ----------------------------------------- */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: bold;
+}
+
+
+body {
+  padding: 1em 1.5em;
+}
+
+p { 
+  padding-top: 0.5em;
+  padding-bottom: 1em;
+}
+
+#access_type, #modified {
+  color: #beaea5;
+  font-size: 75%;
+  font-variant: small-caps;
+}
+
+.attn, .caroline-attn {
+    color: red;
+    font-size: 1.5em;
+    font-variant: small-caps;
+}
+
+/*-------------- background ---------------*/
+html {
+  /*background: url("../images/bg.png") repeat;*/
+}
+
+body {
+  /* background: url("../images/header-bg.png") top repeat-x;*/
+}
+
+/*-------------- typography ---------------*/
+body, h1, h2, h3, h4, h5, input, textarea {
+  font-family: Montserrat, "Arial Narrow Bold", Arial, sans-serif;
+  font-size: 1em;
+  color: #574742;
+}
+
+h1, h2, h3, h4, h5 {
+  padding-top: 0.6em;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: 1.8em;
+}
+
+h2 {
+  font-size: 1.6em;
+  font-weight: 600;
+}
+
+h3 {
+  font-size: 1.4em;
+}
+
+h4 {
+  font-size: 1em;
+}
+
+
+/*-------------- links ---------------*/
+a {
+  color: #eb5f3a;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+a:visited {
+  color: #e1947e;
+}
+
+a:hover {
+  color: #574742;
+}
+
+.boxed {
+  border: 1px solid green ;
+}
+
+.div1,.div2,.div3,.div4 {
+    display: inline-block;
+  }
+
+.button {
+  display: block;
+  text-align: center;
+  background: #eb5f3a;
+  color: white;
+  -webkit-border-radius: 25px;
+  -moz-border-radius: 25px;
+  -ms-border-radius: 25px;
+  -o-border-radius: 25px;
+  border-radius: 25px;
+  font-weight: bold;
+  font-size: 16px;
+  text-transform: uppercase;
+  height: 30px;
+  width: 100%;
+  line-height: 30px;
+  text-shadow: none;
+  border: none;
+}
+
+.button:hover {
+  text-decoration: none;
+  background: #574742;
+  color: white;
+}
+
+.button:visited {
+  color: white;
+}
+
+
+
+form textarea {
+  padding: 10px;
+  width: 340px;
+  height: 150px;
+}
+
+form input:focus, form textarea:focus {
+  outline: none;
+  -webkit-box-shadow: 0 1px 0 0 white, inset 0 1px 2px 0 rgba(0, 0, 0, 0.15), inset 0 0 0px 3px #e2d0cc;
+  -moz-box-shadow: 0 1px 0 0 white, inset 0 1px 2px 0 rgba(0, 0, 0, 0.15), inset 0 0 0px 3px #e2d0cc;
+  box-shadow: 0 1px 0 0 white, inset 0 1px 2px 0 rgba(0, 0, 0, 0.15), inset 0 0 0px 3px #e2d0cc;
+}
+
+/** table of content **/
+
+.er_toc {
+float: right;
+font-size: 10pt;
+max-width: 35%;
+padding: 5px 10px;
+background: #F1F1F1;
+border: solid 1px #DADADA;
+-webkit-border-radius: 3px;
+-moz-border-radius: 3px;
+border-radius: 3px;
+margin: 0 0 10px 15px;
+}
+.er_toc ul, .er_toc ol {
+margin: 0;
+padding: 0;
+}
+.er_toc li {
+padding-top: 5px;
+list-style: none;
+}
+.er_toc ul ul, .er_toc ol ol {
+margin-left: 20px;
+}
+.er_toc .er_toc_title {
+display: block;
+font-weight: bold;
+border-bottom: 2px solid #ccc;
+margin-bottom: 5px;
+}
+.er_toc .er_toc_title_close {
+color: #CCC;
+}
+.er_toc .er_toc_title span {
+display: inline-block;
+border: 0px solid #fff;
+width: 0px;
+overflow: hidden;
+height: 0px;
+margin: 0 0 0 3px;
+}
+.er_toc .er_toc_title_open span {
+border-width: 0 5px 6px;
+border-color: #333 #F1F1F1;
+}
+.er_toc .er_toc_title_close span {
+border-width: 5px 5px 0px;
+border-color: #ccc #F1F1F1;
+}
+a.er_toc_top {
+display: inline-block;
+border: 0px solid #fff;
+width: 0px;
+overflow: hidden;
+height: 0px;
+margin: 0 0 0 5px;
+border-width: 0 6px 12px;
+border-color: #999 #fff;
+}
+a.er_toc_top:hover {
+border-color: #1982D1 #fff;
+}
+.er_toc_disc ul, .er_toc_disc ol {
+margin-left: 20px;
+}
+.er_toc_disc li {
+list-style: disc;
+}
+
+.bicepnet-only, .npx-only, .external-only { display: none }
+
+#search-fp { 
+  position: absolute;
+  top: 0.5em;
+  right: 0.5em;
+  padding: 0.5em;
+  opacity: 0.5;
+  background: #444;
+  background: rgba(0,0,0,.2);
+  border-radius: 10px;
+  box-shadow: 0 1px 1px rgba(0,0,0,.4) inset, 0 1px 0 rgba(255,255,255,.2);
+  z-index: 5;
+}
+
+#header, #header-fp {  
+  position: relative;
+  background: white;
+  padding: 1em 1em 0.5em 1em;
+  margin: 1em 0em 1em 0em;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.15) 0 0 20px 0;
+  -moz-box-shadow: rgba(0, 0, 0, 0.15) 0 0 20px 0;
+  box-shadow: rgba(0, 0, 0, 0.15) 0 0 20px 0;
+}
+
+
+.position-absolute{
+  position: absolute;
+  display: none;
+}
+
+#header-fp { 
+  padding: 0 0 0 0;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.8) 0 0 20px 0;
+  -moz-box-shadow: rgba(0, 0, 0, 0.8) 0 0 20px 0;
+  box-shadow: rgba(0, 0, 0, 0.8) 0 0 20px 0;
+} 
+
+#banner-fp-text {
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  padding: 0.5em;
+  color: white;
+  opacity: 0.75;
+  font-size: 2.4em;
+  font-weight: bold;
+  text-shadow: 0.03em 0.03em 0.15em rgba(180, 180, 180, .6);
+  z-index: 5;
+ }
+
+#content {
+  background: white;
+  padding: 1em 1em 0.5em 1em;
+  margin: 1em 0em 1em 0em;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.15) 0 0 20px 0;
+  -moz-box-shadow: rgba(0, 0, 0, 0.15) 0 0 20px 0;
+  box-shadow: rgba(0, 0, 0, 0.15) 0 0 20px 0;
+}
+
+#banner_container {
+  position: relative;
+}
+
+#banner_container img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+#banner_container img.active {   
+  z-index: 3 !important;
+}
+
+/* Sam's formatting */
+
+pre.debian {color:rgb(227,227,219);width:800px;padding:6px;margin:9px;background-color:rgb(49,8,33);}
+pre.debian prompt {font-weight:bold;}
+pre.debian em {font-style:normal;}
+pre.debian user {color:rgb(182,231,142);}
+pre.debian path {color:rgb(159,215,254);}
+pre.debian .highlight {background-color:rgb(193,45,12);}
+pre.debian .grep {color:rgb(255,128,115);}
+
+pre.cml {color:rgb(227,227,219);width:800px;padding:6px;margin:9px;background-color:rgb(49,8,33);}
+pre.cml prompt {font-weight:bold;}
+pre.cml em {font-style:normal;}
+pre.cml user {color:rgb(182,231,142);}
+pre.cml path {color:rgb(159,215,254);}
+pre.cml .highlight {background-color:rgb(193,45,12);}
+pre.cml .grep {color:rgb(255,128,115);}
+
+/* Colors from the Tango color theme */
+pre.debian dk {color:#000000;} /* dark black */
+pre.debian dr {color:#CC0000;} /* dark red */
+pre.debian dg {color:#4E9A06;} /* dark green */
+pre.debian dy {color:#C4A000;} /* dark yellow */
+pre.debian db {color:#3465A4;} /* dark blue */
+pre.debian dm {color:#75507B;} /* dark magenta */
+pre.debian dc {color:#06989A;} /* dark cyan */
+pre.debian dw {color:#D3D7CF;} /* dark white */
+pre.debian lk {color:#555753;} /* light black */
+pre.debian lr {color:#EF2929;} /* light red */
+pre.debian lg {color:#8AE234;} /* light green */
+pre.debian ly {color:#FCE94F;} /* light yellow */
+pre.debian lb {color:#729FCF;} /* light blue */
+pre.debian lm {color:#AD7FA8;} /* light magenta */
+pre.debian lc {color:#34E2E2;} /* light cyan */
+pre.debian lw {color:#EEEEEC;} /* light white */
+
+ol.checklist li {margin-left:20px;}
+ol.checklist li input {float:left;position:relative;top:2px;left:-45px;}

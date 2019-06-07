@@ -1,0 +1,124 @@
+<!doctype html>
+<html>
+<head>
+  <meta http-equiv=Content-Type content="text/html; charset=utf-8">
+  <title>NET calculator</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/net_opt_grid.css">
+</head>
+<body>
+
+  <h1>NET Calculator</h1>
+  WebGui and python library <a href="NET_details.html">documentation</a>. Version: 0.3 (<a href="version_history.html">history</a>). <a href="https://www.cfa.harvard.edu/~spaine/am/download/index.html">am</a> version: 9.2.<br>
+Bug/feature/suggestion requests: dbarkats [at] cfa.harvard.edu
+
+<form action="/cgi-bin/NETweb.py" method="post" enctype="multipart/form-data" id="NETopts" target="results">
+  <div id="NETopts_bandpass" class="boxed NETopts_section">
+    <h3>Bandpass selection</h3>
+
+    <label for="v_cen">center:</label>
+    <span><input id="v_cen" maxlength="10" size="5" value="95" name="v_cen"> [GHz]</span>
+
+    <label for="frac_bw">fractional width:</label>
+    <span><input id="frac_bw" name="frac_bw" value="0.24" maxlength="5" size="5"> [0-1]</span>
+  </div>
+
+  <div id="NETopts_site" class="boxed NETopts_section">
+    <h3>Site selection</h3>
+   
+    <label for="">Elevation angle:</label>
+    <select name="el">
+        <option value="90">90 deg (zenith)</option>
+        <option value="60" selected>60 deg</option>
+        <option value="45">45 deg</option>
+        <option value="30">30 deg</option>
+      </select>
+
+    <span>
+      <input type="radio" name="site" id="site_presel" value="preselected" checked>
+      <label for="site_presel">Pre-selected:</label>
+    </span>
+    <select name="sites_dd">
+      <option value="SP" selected>SouthPole (default)</option>
+      <option value="CP">Chajnantor plateau (ALMA)</option>
+      <option value="ACT">Cerro Toco (ACT)</option>
+      <option value="MK">Mauna Kea, Hawaii</option>
+      <option value="SU"><a href="http://www.summitcamp.org/">Summit station</a>, Greenland</option>
+      <option value="TI">Ali, Tibet</option>
+      <option value="LMT"><a href="http://www.lmtgtm.org/">LMT</a>, Mexico</option>
+      <option value="MA">Cambridge, MA</option>
+      <option value="SD"><a href="http://www.srt.inaf.it/">Sardinia</a>, Italy</option>
+    </select>
+
+    <span>
+      <input type="radio" name="site" id="site_zones" value="zones">
+      <label for="site_zones">Zones:</label>
+    </span>
+    <span>
+      <select name="zones_dd">
+        <option value="Arctic">Arctic</option>
+        <option value="northern_midlatitude">North mid latitude</option>
+        <option value="tropical">Tropical</option>
+        <option value="southern_midlatitude">South mid latitude</option>
+        <option value="Antarctic" selected>Antarctic</option>
+      </select>
+    </span>
+<br>
+<span>
+     <b> Alt:</b> <input maxlength="6" size="6" value="0" name="alt"> [m]
+</span>
+
+  </div>
+
+  <div id="NETopts_dets" class="boxed NETopts_section">
+    <h3>Detector properties</h3>
+
+    <label for="T0">Bath temp T<sub>0</sub>:</label>
+    <span><input maxlength="10" size="5" value="0.250" name="T0"> [K]</span>
+
+    <label for="">Transition temp T<sub>c</sub>:</label>
+    <span><input name="Tc" value="0.500" maxlength="5" size="5"> [K]</span>
+
+    <label for="">Safety factor sf:</label>
+    <span><input name="sf" value="2.5" maxlength="3" size="3"></span>
+
+    <label for="">Beta:</label>
+    <span><input name="beta" value="2.0" maxlength="3" size="3"></span>
+
+    <label for="">R<sub>tes</sub>:</label>
+    <span><input name="Rtes" value="0.050" maxlength="10" size="5"> [Ohms]</span>
+
+    <label for="">R<sub>shunt</sub>:</label>
+    <span><input name="Rshunt" value="0.003" maxlength="10" size="5"> [Ohms]</span>
+  </div>
+
+  <div id="NETopts_instr" class="boxed NETopts_section" style="width:400px">
+    <h3>Instrument layers</h3>
+
+    <input type="radio" id="layers_default" name="layers" value="default" checked>
+    <span>
+      <label for="layers_default"><a href="NET_details.html">Default</a> instrument selection</label>
+    </span>
+
+    <input type="radio" id="layers_custom" name="layers" value="custom">
+    <label for="layers_custom">Custom layers</label>
+    <textarea name="review" id="review" rows="11" cols=45>
+# csv instrument layers from aperture to detector.
+# Format:
+# Name, Physical Temp [K], Emissivity [%]
+Window      , 280  ,  2
+IR_blocker1 , 150  ,  1
+IR_blocker2 , 70   ,  1
+IR_blocker3 , 30   ,  2
+Ap_stop     , 5    , 14
+Lenses      , 5    ,  5
+Detector    , 0.250, 60</textarea>
+  </div>
+
+  <input value="Calc NET" type="submit">
+  <iframe class="boxed" id="results_frame" name="results" src=""></iframe>
+</form>
+
+</body>
+</html>
+

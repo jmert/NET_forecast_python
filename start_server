@@ -1,0 +1,9 @@
+#!/usr/bin/bash
+
+BASEPATH=$(dirname $(readlink -m $0))
+cd $BASEPATH/www
+if [ "x$(which python3)" != "x" ]; then
+    python3 -m http.server --cgi --bind localhost
+else
+    python2 -m CGIHTTPServer
+fi

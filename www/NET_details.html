@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+
+    <!-- MathJax -->
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <!-- MathJax equation numbering -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+      TeX: { equationNumbers: { autoNumber: "AMS" }}
+      });
+    </script>
+  </head>
+
+    <title>NET Calculator details and assumptions</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <meta charset="utf-8" />
+    <style type="text/css">
+      table { 
+        border-collapse: collapse; 
+        empty-cells: show;
+      }
+      th, td { 
+        border: thin solid black; 
+        padding: 5px;
+      }
+    </style>
+
+  <body>
+    
+    <header>
+      <center>
+      <h1>NET Calculator details and assumptions</h1>
+      </center>
+    </header>
+
+The following note provides a quick description of the math and assumptions behind this <a href="index.html">web NET calculator</a>. The NEP (noise equivalent power in \(W/Hz^{1/2}\)) is calculated as the sum of 5 contributions:
+<ul>
+  <li>photon noise =  (1) shot + (2)  bose noise
+  <li>detector noise = (3) phonon + (4) shunt + (5) tes noise
+</ul>
+
+
+<h2>Instrument layers</h2>
+The instrument is described as a layered structure. Each layer is defined by its physical temperture, its emissivity \(\epsilon\) (and therefore its transmitance (\(Tx = 1-\epsilon \))). The code always appends  two layers on top of the instrument layers for the cmb and the atmosphere. <br>
+A set of default instrument layers is available in the code for different frequency selections. See below for example the default instrument layers assumed for a Keck-like instrument at 100GHz.
+ The web tool also allows the user to specify its own custom instrument layers in free form csv entry.
+<pre>
+# csv instrument layers from aperture to detector.
+# Format:
+# Name, Physical Temp [K], Emissivity [%]
+Window      , 280  ,  2
+IR_blocker1 , 150  ,  1
+IR_blocker2 , 70   ,  1
+IR_blocker3 , 30   ,  2
+Lenses      , 5    , 15
+Detector    , 0.250, 60
+</pre>
+For the default instrument configurations, the physical tempratures remain the same,  but the emissivities scale with frequency:
+<ul>
+  <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+\(v_{cen} < 60GHz\)&nbsp;&nbsp;&nbsp;&nbsp;: \(\epsilon_{window}=0.01, \epsilon_{blocker1}=0.01, \epsilon_{blocker2}=0.01, \epsilon_{blocker3}=0.01\)
+  <li>&nbsp;\(60GHz< v_{cen}<110GHz\)&nbsp;&nbsp;:  \(\epsilon_{window} = 0.02, \epsilon_{blocker1} = 0.01, \epsilon_{blocker2} = 0.01, \epsilon_{blocker3} = 0.02\)
+  <li>\(110GHz< v_{cen}<183GHz\)&nbsp;:  \(\epsilon_{window} = 0.03, \epsilon_{blocker1} = 0.01, \epsilon_{blocker2} = 0.01, \epsilon_{blocker3} = 0.02\)
+  <li>\(183GHz< v_{cen}\)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:  \(\epsilon_{window} = 0.04, \epsilon_{blocker1} = 0.03, \epsilon_{blocker2} = 0.03 ,\epsilon_{blocker3} = 0.03\)
+</ul>
+The optical efficiency, instrument and total loading are then calculated based on the above instrument layers defintion and are reported as diagnostics in the results. See details in "photon loading" section below. 
+<br>
+The end-to-end optical efficiency (OE), an important instrument property is not specified as a user-input, but rather is derived from the cumulative sum of the transmittance of the instrument layers. To tweak the OE, you can use the "custom layers" and add a fake instrument layer with 0K physical temperature and any emissivity you need to obtain your desired OE.
+
+<h2>Site selection</h2>
+The brightness temperature and transmittance  of the atmosphere layer are calculated from Scott Paine's <a href="https://www.cfa.harvard.edu/~spaine/am/">am</a> code.  The user can choose between a few <a href="https://www.cfa.harvard.edu/~spaine/am/cookbook/unix/sites/">pre-selected sites</a> or 5 earth <a href="https://www.cfa.harvard.edu/~spaine/am/cookbook/unix/zonal/">global zones</a>. All of those atmospheric profiles are 10-year MERRA2 median profiles from Scott Paine's <a href="https://www.cfa.harvard.edu/~spaine/am/cookbook/unix/">am examples</a>.  Elevation angle is selected among 90, 60, 45, 30 degrees. For the 5 earth global zones, one can also select a site altitude. This truncates the  atmospheric profile below that altitude.
+
+<h2>Bandpass selection</h2>
+The instrument definition also includes a bandpass definition (a simple top hat for now), defined by a band center and a fractional bandwidth. The tool will later expand to accepting a real measured instrument bandpass file.
+
+<h2>Detector properties</h2>
+Finally, the bolometer is described with the following parameters:
+<ul>
+  <li>bath temperature (default: \(T_0 = 0.250 K \))
+  <li>transition temperature (default: \(T_c = 0.500 K\))
+  <li>safety factor such that \(P_{sat} = sf * Q_{opt} \)(default: \(sf = 2.5 \))
+  <li>conductance scaling (default: \( \beta = 2.0 \))
+  <li>TES resistance  (default: \(R_{tes} = 0.05 \Omega\))
+  <li>shunt resistance (default: \(R_{shunt} = 0.003 \Omega \))
+</ul>
+Also assumed but not available as user input is the DC loop gain (\(L_{dc} = 20\)) and correction factor for shunt noise ( \( L = L_{dc} / (L_{dc} -1) \))
+
+<h2>Photon Noise</h2>
+
+Given the above inputs, the code runs a 1D radiative transfer from the CMB layer through the atmosphere  and all the  instrument layers all the way to the detector to derive the total loading on the detectors in Watts. The calculation is done assuming the power per unit bandwidth absorbed by a detector is the single-moded expression: ie, the Planck spectral radiance of a layer at temperature T is:
+\begin{equation}
+B_\nu = \frac{2\; h \;v^3}{c^2} * \frac{1} {e^x - 1}  \; \; \; \; \; \; \; [W \;m^{-2} \;sr^{-1} \;Hz^{-1}] \\
+x=\frac{h \;v}{k \; T}
+\end{equation}
+The power per unit bandwidth absorbed is then:
+\begin{align}
+        Q_\nu =  A \; \Omega \; Bv
+\end{align}
+Given that \( A \; \Omega = \lambda^2 \), and that our antennas only absorb one polarization (factor of 1/2), the power per unit bandwidth absorbed by our detectors is:
+\begin{align}
+        Q_\nu = h \;v * \frac{ 1} {e^x - 1}  \; \; \; \; \; \; \; [W \; Hz^{-1}]
+\end{align}
+<p>
+Given the instrument layers described above, the code iterates through them to calculate the power incident on the detector from each individual layer. Simplifying the instrument as 4 layers (cmb, atmosphere, optics, detector), each with its defined  physical temperature (\(T\)), emissivity (\(\epsilon\)), and transmitance (\(Tx = 1-\epsilon \)), the calculation for the power incident on the detector from each layer is
+<ul>
+<li> Layer_0: cmb: \(  Tx_0(\nu) = ones(\nu) * Tx_{atm}(\nu) * Tx_{opt}(\nu) * Tx_{det}(\nu) \), \( Q_0(\nu) = Planck(\nu,T_0) * \epsilon_0 * Tx_0 \)
+<li> Layer_1: atm: \(Tx_1(\nu) = ones(\nu) * Tx_{opt}(\nu) * Tx_{det}(\nu)\) , \(Q_1(\nu) = Planck(\nu,T_1) * \epsilon_1 * Tx_1 \)
+<li >Layer_2: opt:  \(Tx_2(\nu) = ones(\nu) * Tx_{det}(\nu)\), \(Q_2(\nu) = Planck(\nu,T_2) * \epsilon_2 * Tx_2 \)
+<li>Layer_3: det:    \(Tx_3(\nu) = ones(\nu)\), \(Q_3(\nu) = Planck(\nu,T_3) * \epsilon_3 * Tx_3 \)
+</ul>
+<p>
+Pretty boring. The incident power from each layer is then just the integral over frequency: \(Q_i = \int{Q_i(\nu) \; d\nu}\)                               
+
+<br>
+ The verbose output of the code gives a diagnostics printout of the mean transmission coefficient at each layer, the cumulative Tx coefficient from that layer to the detector (ie the optical efficiency at the atm layer as its the cumulative Transmittance for all the layers below it), the total radiated power coming out of that layer in picoWatts and in Kelvin Raleigh-Jeans.<br>
+The verbose output of the photon noise calculation assuming the South Pole site, at 95GHz (frac_bw = 0.27), bath temp \(T_0\)=0.250K, and a BICEP/Keck-like instrument layers yields:
+<pre>
+         cmb Tx:1.00, cumulTx to det: 0.31, Power:0.11 [pW], Trj: 1.06 [Krj]
+         atm Tx:0.96, cumulTx to det: 0.32, Power:1.25 [pW], Trj: 11.54 [Krj]
+      window Tx:0.98, cumulTx to det: 0.33, Power:0.64 [pW], Trj: 5.93 [Krj]
+    blocker1 Tx:0.99, cumulTx to det: 0.33, Power:0.17 [pW], Trj: 1.59 [Krj]
+    blocker2 Tx:0.99, cumulTx to det: 0.33, Power:0.08 [pW], Trj: 0.74 [Krj]
+    blocker3 Tx:0.98, cumulTx to det: 0.34, Power:0.07 [pW], Trj: 0.62 [Krj]
+      lenses Tx:0.85, cumulTx to det: 0.40, Power:0.07 [pW], Trj: 0.60 [Krj]
+     antenna Tx:0.40, cumulTx to det: 1.00, Power:0.04 [pW], Trj: 0.34 [Krj]
+                                        Tot Power 2.43 [pW],     22.42 [Krj]
+                                  Inst only Power 1.07 [pW],      9.82 [Krj]
+</pre>
+The photon noise is then the sum of the Bose and Shot noise contributions:
+
+\begin{align}
+NEP_{shot}^2 = \int 2 \; h \; \nu \;  Q_\nu \; d\nu   \; \; \; \; \; \; \; [W^2/Hz]\\
+NEP_{bose}^2 = \int 2 \;  Q_\nu^2  \; d\nu   \; \; \; \; \; \; \; [W^2/Hz]\\
+\end{align}
+
+
+<h2>Detector noise </h2>
+The 3 detector noise contributions (\(NEP_{phonon}\), \(NEP_{shunt}\), and \(NEP_{tes}\)) are calculated as follows (<a href="http://adsabs.harvard.edu/abs/1982ApOpt..21.1125M">Mather 1982, eq 34</a>):
+<p>
+\begin{equation}
+NEP_{phonon}^2 = 4 \; k \;G_c \;T_c^2 \; F^2   \; \; \; \; \; \; \; [W^2/Hz]\\
+G_c = \frac{SF* Q_{tot}}{T_c} * \frac{(1+\beta)}{1-(\frac{T_0}{T_c})^{1+\beta}}   \; \; \; \; [W/K] \\
+F = \sqrt{1 - D * (\frac{\beta}{2}+1) + D^2*\frac{(\beta+2)*(3\beta+2)}{12}}\\
+D = 1 - \frac{T_0}{T_c}  \\
+\end{equation}
+<br>
+\begin{equation}
+NEP_{shunt}^2 = 4 \; k \; T_0 \; R_{shunt} \; (\frac{I_0}{L})^2  \; \; \; \;  [W^2/Hz]\\
+NEP_{tes}^2 = 4 \; k \;T_c \; R_{tes} \; (\frac{I_0}{Ldc})^2  \; \; \; \; \; [W^2/Hz]\\
+I_0^2 = Q_{tot}*\frac{(SF-1)}{R_{shunt}}  \; \; [Amps^2]\\
+L = \frac{L_{dc}}{L_{dc}-1} \\
+\end{equation}
+</p>
+   
+<h2>NET</h2>
+
+\begin{equation}
+NEP_{tot} = \sqrt{NEP_{shot}^2 + NEP_{bose}^2 + NEP_{phonon}^2 + NEP_{shunt}^2 + NEP_{tes}^2}   \; \; \; \; \; \; \;[W/\sqrt{Hz}]\\\\
+NET = \frac{NEP_{tot}}{\sqrt{2}\; dPdT_{cmb}} \; \; \; \;   [\mu K \;\sqrt{s}]\\\\
+\end{equation}
+
+<p>
+
+
+<div style="border-top: thin solid black;">
+      <p>
+	<a href="index.html">Back</a>
+      </p>
+</div>
+
+</body>
+
+</html>

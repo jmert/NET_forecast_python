@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 #import matplotlib as mpl
 #mpl.use('Agg')
 from pylab import *
@@ -15,14 +17,14 @@ class NETlib():
     class with all necesary libraries to compute bolometer NET
 
     """
-    
+
     def __init__(self, verbose = True):
         """
 
         symlink from NETlib.py to the latest version NETlib_v0.X.py
 
-        """        
-        self.path = '/n/home01/dbarkats/work/20170801_S4_NET_forecast_python/'
+        """
+        self.path = os.path.realpath(os.path.dirname(__file__))
         self.amversion = 9.2
         self.verbose = verbose
         self.orig_stdout = sys.stdout
@@ -30,34 +32,34 @@ class NETlib():
         #if self.verbose==False:
         #    self.f = open('outputs.txt','w')
         #    sys.stdout = self.f
-            
+
     def getVersion(self):
 
-        scriptFile = os.readlink(self.path+'NETlib.py')
+        scriptFile = os.readlink(os.path.join(self.path, 'NETlib.py'))
         self.version = scriptFile.split('_')[1].split('.py')[0]
-        
+
     def calc_NET(self,opts):
-        
+
         self.getVersion()
         if (self.verbose):
-            print "###  NETlib.py version: %s, am version: %s"%(self.version, self.amversion)
-            print '' 
-            print "Summary of selected options:"
+            print("###  NETlib.py version: %s, am version: %s"%(self.version, self.amversion))
+            print('')
+            print("Summary of selected options:")
         (atm,band,bolo,s) = self.define_instrument(opts=opts)
         pwv = atm['pwv']
         if (self.verbose):
-            print("###   v_cen: %.1fGHz, frac_bw: %.2f, v_lo: %.1fGHz, v_hi: %.1fGHz" 
+            print("###   v_cen: %.1fGHz, frac_bw: %.2f, v_lo: %.1fGHz, v_hi: %.1fGHz"
                   %(band['v_cen']/1e9, band['frac_bw'], band['v_lo']/1e9, band['v_hi']/1e9))
             print("###   site: '%s', el: %.1f deg, alt: %4.1f meters, pwv: %2.3f mm"
                   %(atm['site'], atm['el'], atm['alt'], pwv/1000.))
-            print('###   T0: %.3fK, Tc: %.3fK, sf: %.1f, beta: %.1f, Rtes: %.3f, Rshunt: %.3f' 
+            print('###   T0: %.3fK, Tc: %.3fK, sf: %.1f, beta: %.1f, Rtes: %.3f, Rshunt: %.3f'
                   %(bolo['T0'], bolo['Tc'],bolo['sf'],bolo['beta'],bolo['Rtes'],bolo['Rshunt']))
-            print " "
-  
-        (Q,Qv,nep1,dPdT,s) = self.calc_photon_noise(atm,band,s) 
+            print(" ")
+
+        (Q,Qv,nep1,dPdT,s) = self.calc_photon_noise(atm,band,s)
         oe = s['cumTxm'][1]*100.
         (bolo,nep2) = self.calc_det_noise(bolo,Q)
-        
+
         # sum up total noise
         nep = {}
         nep['photon'] = sqrt(nep1['shot']**2 + nep1['bose']**2) ;
@@ -65,7 +67,7 @@ class NETlib():
         nep['tot'] = sqrt(nep['photon']**2 + nep['detector']**2) ;
 
         if (self.verbose):
-            print ('###   Summary of NEPs')
+            print('###   Summary of NEPs')
             print('nep.shot:                        %3.3e [W/sqrt(Hz)]'%nep1['shot'])
             print('nep.bose:                        %3.3e [W/sqrt(Hz)]'%nep1['bose'])
             print('nep.phot (shot+bose):            %3.3e [W/sqrt(Hz)]'%nep['photon'])
@@ -74,11 +76,11 @@ class NETlib():
             print('nep.tes:                         %3.3e [W/sqrt(Hz)]'%nep2['tes'])
             print('nep.detector (phonon+shunt+tes): %3.3e [W/sqrt(Hz)]'%nep['detector'])
             print('nep.total:                       %3.3e [W/sqrt(Hz)]'%nep['tot'])
-            print ("")
-            print ('###  Other relevant output parameters')
+            print("")
+            print('###  Other relevant output parameters')
             print('dPdTcmb: %3.4f pW/K, dPdTrj: %3.4f pW/K'%(dPdT['cmb']*1e12,dPdT['rj']*1e12))
             print('Gc: %3.2f pW/K'%(bolo['Gc']*1e12))
-            print "End-to-end OE: %5.2f"%oe
+            print("End-to-end OE: %5.2f"%oe)
             print('')
 
         # we say we are 'photon noise limited' if NEP_photon >~ NEP_detector
@@ -86,7 +88,7 @@ class NETlib():
         net = 1e6* nep['tot'] / (dPdT['cmb'] * sqrt(2))  #  uK_cmb sqrt(s)
         if (self.verbose):
             print('NET: %6.2f uK sqrt(s)'%(net))
-        
+
         return net,pwv,atm,band,bolo,s
 
     def getAtmosphere(self, atm = None):
@@ -98,17 +100,17 @@ class NETlib():
         v: array of frequency
         dv: frequency step
         Tx: array of Transmission coef
-        
+
         """
-        
+
         zones = ['Antarctic','Arctic','tropical','northern_midlatitude','southern_midlatitude']
-        zones_alts = array(range(0,11)+[20,30,40,50])*1000
+        zones_alts = array(list(range(0,11))+[20,30,40,50])*1000
 
         if atm == None:
             atm = {}
 
         if 'atmdir' not in atm.keys():
-            atm['atmdir'] = '/n/home01/dbarkats/work/20170801_S4_NET_forecast_python/am_spectra/'
+            atm['atmdir'] = os.path.join(self.path, 'am_spectra')
         if 'site' not in atm.keys():
             atm['site'] = 'SP' # South Pole default site
         if 'el' not in atm.keys():
@@ -117,7 +119,7 @@ class NETlib():
             atm['alt'] = 0     # altitude = 0m is default for zones
         if 'pc' not in atm.keys():
             atm['pc'] = 50     # median = 50th percentile is default
-        
+
         if atm['site'] == 'SP':
             name = 'SPole'
             atm['file']='sites/%s_annual_%d_el%s.out'%(name,atm['pc'],str(atm['el']))
@@ -151,28 +153,30 @@ class NETlib():
             atm['file']='sites/%s_annual_%d_el%s.out'%(name,atm['pc'],str(atm['el']))
             atm['alt'] = 50
         elif atm['site'] == 'SD':
-            name = 'Sardinia'    
+            name = 'Sardinia'
             atm['file']='sites/%s_annual_%d_el%s.out'%(name,atm['pc'],str(atm['el']))
             atm['alt']  = 600
         elif atm['site']== 'custom':
             name = 'custom'
             if 'file' not in atm.keys():
-                print 'ERROR: atm[''name'']= custom must have a atm[''file''] defined'
+                print('ERROR: atm[''name'']= custom must have a atm[''file''] defined')
                 sys.exit()
             if 'atmdir' not in atm.keys():
-                print 'ERROR: atm[''name'']= custom must have a atm[''atmdir''] defined'
-                sys.exit()    
+                print('ERROR: atm[''name'']= custom must have a atm[''atmdir''] defined')
+                sys.exit()
         elif atm['site'] in zones:  # Zones
             name = atm['site']
             i1 = sort(argsort(abs(zones_alts-atm['alt']))[0])
             atm['alt'] = zones_alts[i1]
             atm['file']='zones/%s_annual_trunc%d_el%s.out'%(name,atm['alt'],str(atm['el']))
         else:
-            print >> self.orig_stdout, 'ERROR: atm.site must be one of: SP, CP, SU, TI for the moment'
+            print('ERROR: atm.site must be one of: SP, CP, SU, TI for the moment',
+                    file=self.orig_stdout)
             sys.exit()
-        
+
         # load in an atmospheric transmission spectrum from site
-        amOut, pwv, dry_air, o3, Tgnd, Pgnd= self.readAmResults(atm['atmdir']+atm['file'])
+        amOut, pwv, dry_air, o3, Tgnd, Pgnd = self.readAmResults(
+                os.path.join(atm['atmdir'], atm['file']))
         atm['v'] = amOut['f']*1e9; # in GHz
         atm['dv'] = atm['v'][1]-atm['v'][0] # freq step size in Hz
         atm['tau']= amOut['tau']   # tau
@@ -192,13 +196,13 @@ class NETlib():
         Define all the relevant instrument parameters
         input is just atmospheric Tx spectra
         output is:
-           - s structure which gives us the layers of the instrument  
+           - s structure which gives us the layers of the instrument
            - add a fake first layer above atmosphere for CMB with emissivity = 1 and transmission = 1
-           - band.v_cen band.frac_bw, band.v_lo, band.v_hi  
+           - band.v_cen band.frac_bw, band.v_lo, band.v_hi
            - bolo structure defines the device parameters
         """
-            
-        # define atmosphere 
+
+        # define atmosphere
         atm = self.getAtmosphere(opts['atm']) ;
 
         # define bandpass
@@ -210,7 +214,7 @@ class NETlib():
             band['frac_bw'] = 0.24;  # fractional BW, (delta_v/v)
         band = self.calc_band(band);
 
-        # define bolometer device parameters 
+        # define bolometer device parameters
         if 'bolo' in opts.keys():
             bolo = opts['bolo'];
         else:
@@ -231,7 +235,7 @@ class NETlib():
             bolo['Rtes'] = 0.05 #  Ohm
         if 'Rshunt' not in bolo.keys():
             bolo['Rshunt'] = 0.003 #  Ohm
-        
+
         bolo['Ldc'] = 20;        # loop gain
         bolo['L'] = bolo['Ldc']/(bolo['Ldc']-1); # correction factor for shunt noise
 
@@ -242,7 +246,7 @@ class NETlib():
        # eps is emissivity of the element (from 0 to 1) or absorption coef.
        # Tx is transmission coef of element (Tx = 1 - eps)
        # optical efficiency is Tx through the whole instrument.
-        
+
         Tx1 = ones(size(atm['Tx']));
         if 's' in  opts.keys():
             s = opts['s']
@@ -252,41 +256,41 @@ class NETlib():
             s={}
             for k in ['name','T','eps','Tx']:
                 s[k]=[]
-            
+
             if band['v_cen'] < 60e9:
-                s['name'].append('window');  s['T'].append(280);       s['eps'].append(0.01) 
-                s['name'].append('blocker1');s['T'].append(150);       s['eps'].append(0.01) 
-                s['name'].append('blocker2');s['T'].append(70);        s['eps'].append(0.01) 
+                s['name'].append('window');  s['T'].append(280);       s['eps'].append(0.01)
+                s['name'].append('blocker1');s['T'].append(150);       s['eps'].append(0.01)
+                s['name'].append('blocker2');s['T'].append(70);        s['eps'].append(0.01)
                 s['name'].append('blocker3');s['T'].append(30);        s['eps'].append(0.01)
-                s['name'].append('ap_stop');  s['T'].append(5);        s['eps'].append(0.14) 
-                s['name'].append('lenses');  s['T'].append(5);         s['eps'].append(0.05) 
-                s['name'].append('antenna'); s['T'].append(bolo['T0']);s['eps'].append(0.60) 
+                s['name'].append('ap_stop');  s['T'].append(5);        s['eps'].append(0.14)
+                s['name'].append('lenses');  s['T'].append(5);         s['eps'].append(0.05)
+                s['name'].append('antenna'); s['T'].append(bolo['T0']);s['eps'].append(0.60)
 
             elif band['v_cen'] < 110e9:
-                s['name'].append('window');  s['T'].append(280);       s['eps'].append(0.02) 
-                s['name'].append('blocker1');s['T'].append(150);       s['eps'].append(0.01) 
-                s['name'].append('blocker2');s['T'].append(70);        s['eps'].append(0.01) 
-                s['name'].append('blocker3');s['T'].append(30);        s['eps'].append(0.02) 
-                s['name'].append('ap_stop');  s['T'].append(5);        s['eps'].append(0.14) 
-                s['name'].append('lenses');   s['T'].append(5);        s['eps'].append(0.05) 
-                s['name'].append('antenna'); s['T'].append(bolo['T0']);s['eps'].append(0.60) 
+                s['name'].append('window');  s['T'].append(280);       s['eps'].append(0.02)
+                s['name'].append('blocker1');s['T'].append(150);       s['eps'].append(0.01)
+                s['name'].append('blocker2');s['T'].append(70);        s['eps'].append(0.01)
+                s['name'].append('blocker3');s['T'].append(30);        s['eps'].append(0.02)
+                s['name'].append('ap_stop');  s['T'].append(5);        s['eps'].append(0.14)
+                s['name'].append('lenses');   s['T'].append(5);        s['eps'].append(0.05)
+                s['name'].append('antenna'); s['T'].append(bolo['T0']);s['eps'].append(0.60)
 
             elif band['v_cen'] < 183e9:
-                s['name'].append('window');  s['T'].append(280);       s['eps'].append(0.03) 
-                s['name'].append('blocker1');s['T'].append(150);       s['eps'].append(0.01) 
-                s['name'].append('blocker2');s['T'].append(70);        s['eps'].append(0.01) 
+                s['name'].append('window');  s['T'].append(280);       s['eps'].append(0.03)
+                s['name'].append('blocker1');s['T'].append(150);       s['eps'].append(0.01)
+                s['name'].append('blocker2');s['T'].append(70);        s['eps'].append(0.01)
                 s['name'].append('blocker3');s['T'].append(30);        s['eps'].append(0.02)
-                s['name'].append('ap_stop'); s['T'].append(5);         s['eps'].append(0.14)  
-                s['name'].append('lenses');  s['T'].append(5);         s['eps'].append(0.05) 
+                s['name'].append('ap_stop'); s['T'].append(5);         s['eps'].append(0.14)
+                s['name'].append('lenses');  s['T'].append(5);         s['eps'].append(0.05)
                 s['name'].append('antenna'); s['T'].append(bolo['T0']);s['eps'].append(0.60)
-            
+
             else:
-                s['name'].append('window');  s['T'].append(280);       s['eps'].append(0.04) 
-                s['name'].append('blocker1');s['T'].append(150);       s['eps'].append(0.03) 
-                s['name'].append('blocker2');s['T'].append(70);        s['eps'].append(0.03) 
+                s['name'].append('window');  s['T'].append(280);       s['eps'].append(0.04)
+                s['name'].append('blocker1');s['T'].append(150);       s['eps'].append(0.03)
+                s['name'].append('blocker2');s['T'].append(70);        s['eps'].append(0.03)
                 s['name'].append('blocker3');s['T'].append(30);        s['eps'].append(0.03)
-                s['name'].append('ap_stop');  s['T'].append(5);        s['eps'].append(0.14)  
-                s['name'].append('lenses');  s['T'].append(5);         s['eps'].append(0.05) 
+                s['name'].append('ap_stop');  s['T'].append(5);        s['eps'].append(0.14)
+                s['name'].append('lenses');  s['T'].append(5);         s['eps'].append(0.05)
                 s['name'].append('antenna'); s['T'].append(bolo['T0']);s['eps'].append(0.60)
 
         # multiply all eps (custom layers and default layers) by Tx1 so it's the right array  size
@@ -296,29 +300,29 @@ class NETlib():
         # insert cmb and atmosphere layers to custom and default layers
         s['name'].insert(0,'atm');s['T'].insert(0,250);s['Tx'].insert(0,atm['Tx']);s['eps'].insert(0,1-atm['Tx']);
         s['name'].insert(0,'cmb');s['T'].insert(0,Tcmb);s['Tx'].insert(0,Tx1);s['eps'].insert(0,Tx1);
-        
+
         #TODO: change atm['T'] to be consistent with atm['Trj']
 
         # set eps of last element to 0 in band and 1 outside band
-        s['eps'][-1][find(atm['v'] < band['v_lo'])]=1; 
-        s['eps'][-1][find(atm['v']> band['v_hi'])]=1;
-        
+        s['eps'][-1][nonzero(atm['v'] < band['v_lo'])]=1;
+        s['eps'][-1][nonzero(atm['v']> band['v_hi'])]=1;
+
         # define Tx of all other layers
         for i in range(shape(s['Tx'])[0],size(s['name'])):
             s['Tx'].append(1-s['eps'][i] )
-            
+
         return [atm,band,bolo,s]
 
 
     def  calc_photon_noise(self,atm,band,s):
-        
+
         """
         calculates the photon noise contribution to the NEP
 
         """
-  
+
         # define indices of bandpass
-        q=find( (atm['v'] < band['v_hi']) & (atm['v'] > band['v_lo'])) 
+        q=nonzero( (atm['v'] < band['v_hi']) & (atm['v'] > band['v_lo']))
 
         Nv = size(atm['Tx'])  # number of frequency points
         Nl = size(s['name'])  # number of instrument layers
@@ -339,10 +343,10 @@ class NETlib():
 
          # get W/K conversion factor
         dPdT = self.calc_dPdT(atm,Tx_tot)
-        
+
         # calculate optical power per unit wavelength at detector from each source:
-        # this is the Planck brightness times the source emissivity 
-            
+        # this is the Planck brightness times the source emissivity
+
         class Power:
             tot = 0  # power incident from all elements between cmb and detector:
             inst = 0 # power incident only from instrument-related parts
@@ -351,15 +355,15 @@ class NETlib():
 
         Q = Power();
         Qvtot = 0
-        
+
         s['Txm']= []
         s['cumTxm']= []
         s['Qv']= []
         s['Q']= []
         s['Trj'] = []
-        
+
         if (self.verbose):
-            print '###   Summary of instrument layers and photon noise'
+            print('###   Summary of instrument layers and photon noise')
 
         for i in range(Nl):
             trans = ones(Nv);
@@ -388,11 +392,11 @@ class NETlib():
                   %(Q.tot *1e12, Q.Trjtot))
             print('                                   Inst-only Power:%2.3f [pW], Trj:%6.3f [Krj]'
                   %(Q.inst*1e12, Q.Trjinst));
-            print (' ')
+            print(' ')
         nep = {}
         nep['shot'] = sqrt(2* sum(Qvtot * h *atm['v'])*atm['dv'] ) ; # W / sqrt(Hz)
         nep['bose'] = sqrt(2* sum(Qvtot**2)*atm['dv'] )    ; # W / sqrt(Hz)
-        
+
         return  Q,Qvtot,nep,dPdT,s
 
 
@@ -402,29 +406,29 @@ class NETlib():
         bolo['Gc'] = self.calc_Gc(bolo,Q) ;
         nep['phonon'] = self.calc_phonon_noise(bolo) ;
         (nep['shunt'],nep['tes']) = self.calc_johnson_noise(bolo, Q)
-        
+
         return bolo, nep
 
     def calc_Gc(self, bolo, Q):
-        
+
         Gc = bolo['sf']*Q.tot/bolo['Tc'] * (1+bolo['beta'])/(1-(bolo['T0']/bolo['Tc'])**(1+bolo['beta'])) # W/K
         return Gc
 
     def calc_phonon_noise(self,bolo):
-        
+
 
         D = 1-(bolo['T0']/bolo['Tc'])    # see Mather eq 34
-        F = sqrt(1 - (1+bolo['beta']/2)*D + (bolo['beta']+2)*(3*bolo['beta']+2)/12*D**2) 
+        F = sqrt(1 - (1+bolo['beta']/2)*D + (bolo['beta']+2)*(3*bolo['beta']+2)/12*D**2)
         nep_phonon = sqrt(4 * k * bolo['Gc'] * bolo['Tc']**2 * F**2)      # W / sqrt(Hz)
-        
+
         return nep_phonon
-  
+
     def calc_johnson_noise(self,bolo, Q):
 
         I_0 = sqrt(Q.tot*(bolo['sf']-1) / bolo['Rshunt']) # Amps
         nep_shunt = sqrt(4*k*bolo['T0']*bolo['Rshunt']*I_0**2/bolo['L']**2)  # W / sqrt(Hz)
         nep_tes = sqrt(4*k*bolo['Tc']*bolo['Rtes']*I_0**2/bolo['Ldc']**2)      # W / sqrt(Hz)
-    
+
         return nep_shunt, nep_tes
 
 
@@ -436,13 +440,13 @@ class NETlib():
         band['bw'] = band['v_cen']*band['frac_bw']    # BW
         band['v_lo'] = band['v_cen'] - band['bw']/2;  # band edge low
         band['v_hi'] = band['v_cen'] + band['bw']/2;  # band edge high
-        
+
         return band
 
 
     def planck_v(self,v,T,sm=1):
         """
-         calculates the Planck spectral radiance as a function of frequency 
+         calculates the Planck spectral radiance as a function of frequency
          and Temperature of the emitter
          v is an array of frequencies in Hz
          T is a single temperature in K
@@ -451,7 +455,7 @@ class NETlib():
 
         """
         x=(h*v)/(k*T)
-  
+
         # spectral radiance  (W m^-2 sr^-1 Hz^-1)
         Bv = ( (2*h*v**3) / c**2 ) * ( 1 / ( exp(x) - 1 ) );
 
@@ -460,8 +464,8 @@ class NETlib():
         # Antenna theorem states A*Omega = lambda^2 so
         # Qv = lambda^2 * 2* h * v^3/c^2 *  1 ./ ( exp((v.*h)./(k.*T)) - 1 ) );
         # Qv = h*v *  1 ./ ( exp((v.*h)./(k.*T)) - 1 ) );
-        # Qv is the single moded expression 
-        # for the power  per unit frequency absorbed by a single moded antenna, 1 polarization (that is 
+        # Qv is the single moded expression
+        # for the power  per unit frequency absorbed by a single moded antenna, 1 polarization (that is
         # where the factor of 1/2 disappeared)
 
         # single moded expression
@@ -477,28 +481,28 @@ class NETlib():
         """
         Partial derivative of the Planck function with respect
         to temperature at given temperature and frequency.
-        
+
         Input in Hz and K
         Output in W m^-2 Hz^-1 ster^-1 K^-1
 
         """
-        x=(h*v)/(k*T);        
+        x=(h*v)/(k*T);
         dIdT=((2*h**2*v**4)/(c**2*k*T**2))*(exp(x)/(exp(x)-1)**2);
 
         # the factor of 0.5* c^2/v^2 is to convert to single moded power per unit freq.
         if sm == 1:
-            dIdT = dIdT * 0.5 * c**2 /v**2 ; 
+            dIdT = dIdT * 0.5 * c**2 /v**2 ;
 
         return dIdT
 
     def calc_dPdT(self,atm,Tx_tot):
-  
+
         #dT = .0001;
         #Qv_cmb_plus_dT = planck_v(atm['v'],T+dT,1) * Tx_tot ;
         #Qv_cmb =         planck_v(atm['v'],T,1)  * Tx_tot;
         #dPdT = (sum(Qv_cmb_plus_dT)*atm['dv'] - sum(Qv_cmb)*atm['dv'])/dT  # W/K_cmb
 
-        # 27/03/2017: dB replaces the numerical derivative 
+        # 27/03/2017: dB replaces the numerical derivative
         # with the planck_dIdT function which provides the analytical derivative
 
         v = atm['v']
@@ -519,10 +523,10 @@ class NETlib():
         """
         Reads the results of the .out as well
         as well as the total from the .err for diagnostics
-        copied directly from merra2Player.py 
+        copied directly from merra2Player.py
 
         """
-        
+
         try:
             Pbase = []
             Tbase = []
@@ -534,7 +538,7 @@ class NETlib():
                 if line.startswith('Pbase'):
                     Pbase.append(float(line.split()[1]))
                 if line.startswith('Tbase'):
-                    Tbase.append(float(line.split()[1]))   
+                    Tbase.append(float(line.split()[1]))
                 if line[0] == '#' and 'dry_air' in line:
                     dry_air = float(line.split()[2])
                 if line[0] == '#' and 'h2o' in line:
@@ -545,9 +549,9 @@ class NETlib():
             Pgnd = Pbase[-1]
 
             amOut = genfromtxt(outfn,delimiter='',names=outfmt)
-            
+
         except:
-            print "ERROR: could not read file output spectra for %s"%outfn
+            print("ERROR: could not read file output spectra for %s"%outfn)
 
         # skip 1st row to avoid zero freq.
         return  amOut[1:], pwv, dry_air, o3, Tgnd, Pgnd
@@ -560,13 +564,13 @@ class NETlib():
         """
         Pgnd = 10* 101.29 * ((15.04 - .00649 * Hgnd + 273.1)/288.08)**5.256
         return Pgnd
-    
+
     def truncateProfile(self,l, Hgnd):
         """
-        given l layer, find  last layer 
+        given l layer, find  last layer
         when we trunctate at Hgrnd height in meters
         """
-        
+
         # find 2 closest layers in height
         Hbase = Hgnd
         s=abs(array(l.Hbase)-Hgnd)
@@ -577,19 +581,19 @@ class NETlib():
         h2obase = interp(Pbase,Pinterp,[l.h2o[i1],l.h2o[i2]])
         o3base = interp(Pbase,Pinterp,[l.o3[i1],l.o3[i2]])
 
-        #print Pbase, Pinterp
-        #print Hbase, l.Hbase[i1:i2+1]
-        #print Tbase,  l.Tbase[i1:i2+1]
-        #print h2obase, l.h2o[i1:i2+1]
-        #print o3base, l.o3[i1:i2+1]
+        #print(Pbase, Pinterp)
+        #print(Hbase, l.Hbase[i1:i2+1])
+        #print(Tbase,  l.Tbase[i1:i2+1])
+        #print(h2obase, l.h2o[i1:i2+1])
+        #print(o3base, l.o3[i1:i2+1])
 
         return i1,i2, Pbase, Tbase, h2obase, o3base
-    
-    def rewriteAmc(self,filename,Hgnd = 0):   
-        
+
+    def rewriteAmc(self,filename,Hgnd = 0):
+
         L = self.readAmc(filename)
         i1,i2, Pbase, Tbase, h2obase, o3base = self.truncateProfile(L,Hgnd)
-        
+
         filebase = filename.split('.amc')[0]
         filebase_trunc = '%s_trunc%d'%(filebase,Hgnd)
         if os.path.isfile('am_spectra/%s.amc'%filebase_trunc):
@@ -602,7 +606,7 @@ class NETlib():
         last_layer = False
         done = False
         for line in lines:
-            if done ==True: 
+            if done ==True:
                 break
             if (line.startswith('#')) or (line.startswith('?')) or (line == '\n'):
                 g.write(line)
@@ -616,12 +620,12 @@ class NETlib():
                     newline = newline.replace(sline[6],'%3.0f'%Hgnd)
                     g.write(newline)
                 else:
-                    g.write(line)        
+                    g.write(line)
             elif sline[0] =='Tbase' :
                 if last_layer == True:
                     g.write(line.replace(sline[1],'%3.3f'%Tbase,1))
                 else:
-                    g.write(line) 
+                    g.write(line)
 
             elif (sline[0] =='column') and (sline[1] =='dry_air'):
                 g.write(line)
@@ -630,21 +634,21 @@ class NETlib():
                 if last_layer == True:
                     g.write(line.replace(sline[3],'%3.3e'%h2obase,1))
                 else:
-                    g.write(line) 
+                    g.write(line)
             elif (sline[0] =='column') and (sline[1] =='o3'):
                 if last_layer == True:
                     g.write(line.replace(sline[3],'%3.3e'%o3base,1))
                     done = True
                 else:
-                    g.write(line) 
+                    g.write(line)
             else:
                 g.write(line)
-            
+
         f.close()
         g.close()
         return filebase_trunc
-        
-                    
+
+
     def readAmc(self,filename):
         """
         """
@@ -656,7 +660,7 @@ class NETlib():
             h2o = []
             dry_air = []
         L = Layer();
-        
+
         f = open('am_spectra/%s'%filename,'r')
         lines = f.readlines()
 
@@ -670,13 +674,13 @@ class NETlib():
             elif sline[0] =='Tbase' :
                 L.Tbase.append(float(sline[1]))
             elif (sline[0] =='column') and (sline[1] =='dry_air'):
-                L.dry_air.append(sline[2]) 
+                L.dry_air.append(sline[2])
             elif (sline[0] =='column') and (sline[1] =='h2o'):
                 L.h2o.append(float(sline[3]))
             elif (sline[0] =='column') and (sline[1] =='o3'):
                 L.o3.append(float(sline[3]))
-        
+
         f.close()
-        
+
         return L
-           
+

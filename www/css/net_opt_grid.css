@@ -1,0 +1,53 @@
+#NETopts {
+  display: grid;
+  grid-template-columns: repeat(4, max-content);
+  grid-gap: 0.5em;
+  margin-top: 1em;
+}
+@media only screen and (max-width: 1350px) {
+  #NETopts {
+    grid-template-columns: repeat(2, max-content);
+  }
+}
+@media only screen and (max-width: 750px) {
+  #NETopts {
+    grid-template-columns: repeat(1, max-content);
+  }
+}
+
+.NETopts_section {
+  padding: 0em 0.5em;
+  padding-bottom: 0.7em;
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  grid-auto-rows: min-content;
+  grid-gap: 0.3em;
+}
+
+.NETopts_section > h3 {
+  grid-column: 1 / -1;
+}
+.NETopts_section label {
+  font-weight: bold;
+}
+
+#layers_custom:not(:checked) ~ #review {
+  display: block;
+  visibility: hidden;
+}
+#layers_custom:checked ~ #review {
+  display: block;
+  visibility: visible;
+}
+#review {
+  grid-column: 1 / -1;
+  width: 100%;
+  height: unset;
+  box-sizing: border-box;
+  font-family: monospace;
+}
+#results_frame {
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 25em;
+}
